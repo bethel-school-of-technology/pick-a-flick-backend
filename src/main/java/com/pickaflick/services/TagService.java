@@ -31,7 +31,7 @@ public class TagService {
 	
 	// SetTagId needs to be Long for it to be a many to many. I have used setTagName, 
 	// but this may need to be changed.
-	// Above comments were for previous code that is commented out below under addMovies() - not sure if we need to do this or not.
+	// Above comments were for previous code that is commented out below under addTag() - not sure if we need to do this or not.
 	public Tag addTag(Tag tag) {
 		// Don't think we need this, but didn't want to delete just in case...
 		// tags.setTagName(UUID.randomUUID().toString());
