@@ -3,6 +3,10 @@ package com.pickaflick.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.pickaflick.exceptions.NotFoundException;
@@ -10,7 +14,7 @@ import com.pickaflick.models.User;
 import com.pickaflick.repos.IUserRepo;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService{
 	
 	private final IUserRepo userRepo;
 	
@@ -18,6 +22,25 @@ public class UserService {
 	public UserService(IUserRepo userRepo) {
 		this.userRepo = userRepo;
 	}
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	
+	public UserDetails loadUserByUsername(String username) {
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
+			throw new UsernameNotFoundException(username);
+		}
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthorities());
+	}
+
+	public UserDetails Save(User newUser) {
+		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+		User savedUser = userRepo.save(newUser);
+		return new org.springframework.security.core.userdetails.User(savedUser.getUsername(), savedUser.getPassword(), getAuthorities());
+	}
+
 	
 	public List<User> findAllUsers() {
 		return userRepo.findAll();
