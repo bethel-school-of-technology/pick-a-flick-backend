@@ -1,6 +1,8 @@
 package com.pickaflick.models;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -23,6 +25,15 @@ public class Movie implements Serializable {
 	private String leadActors;
 	private String description;
 	
+//	Creates Many to Many relationship between Movies and Tags
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinTable(
+		name = "movie_tags",
+		joinColumns = @JoinColumn(name = "movieId"),
+		inverseJoinColumns = @JoinColumn(name = "tagId")
+		)
+	private Set<Tag> tags = new HashSet<>();
+
 	public Movie() {
 		
 	}
@@ -111,6 +122,26 @@ public class Movie implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public Set<Tag> getTags() {
+		return tags;
+	}
+
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
+	}
+	
+//	for Many to Many relationship - links a tag to a movie
+	public void attachTag(Tag tag) {
+		this.tags.add(tag);
+		tag.getMovies().add(this);
+	}
+	
+//	for Many to Many relationship - removes a tag from a movie
+	public void detachTag(Tag tag) {
+		this.tags.remove(tag);
+		tag.getMovies().remove(this);
 	}
 
 	@Override

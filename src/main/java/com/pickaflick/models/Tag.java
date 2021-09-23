@@ -1,8 +1,12 @@
 package com.pickaflick.models;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Tag implements Serializable {
@@ -15,6 +19,11 @@ public class Tag implements Serializable {
 	private int authorId;
 	private String tagName;
 	
+//	Creates Many to Many relationship between Movies and Tags
+	@JsonIgnore
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "tags")
+	private Set<Movie> movies = new HashSet<>();
+
 	public Tag() {
 		
 	}
@@ -48,6 +57,14 @@ public class Tag implements Serializable {
 
 	public void setTagName(String tagName) {
 		this.tagName = tagName;
+	}
+	
+	public Set<Movie> getMovies() {
+		return movies;
+	}
+	
+	public void setMovies(Set<Movie> movies) {
+		this.movies = movies;
 	}
 
 	@Override
