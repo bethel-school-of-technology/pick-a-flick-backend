@@ -1,5 +1,16 @@
 package com.pickaflick.models;
 
+////Add these 2 back in to pom.xml/remove to test without security errors:
+//<dependency>
+//<groupId>org.springframework.boot</groupId>
+//<artifactId>spring-boot-starter-security</artifactId>
+//</dependency>
+//<dependency>
+//<groupId>org.springframework.security</groupId>
+//<artifactId>spring-security-test</artifactId>
+//<scope>test</scope>
+//</dependency>
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +27,7 @@ public class Movie implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false, updatable = false)
 	private Long movieId;
-	private String authorId;
+	private final Long authorId;
 	private String imageUrl;
 	private String movieTitle;
 	private int year;
@@ -34,11 +45,12 @@ public class Movie implements Serializable {
 		)
 	private Set<Tag> tags = new HashSet<>();
 
+	// need to find a way to set this equal to the userId...
 	public Movie() {
-		
+		this.authorId = 1L;
 	}
 	
-	public Movie(Long movieId, String authorId, String imageUrl, String movieTitle, int year, int runTimeInMinutes,
+	public Movie(Long movieId, Long authorId, String imageUrl, String movieTitle, int year, int runTimeInMinutes,
 			String genre, String leadActors, String description) {
 
 		this.movieId = movieId;
@@ -60,13 +72,13 @@ public class Movie implements Serializable {
 		this.movieId = movieId;
 	}
 
-	public String getAuthorId() {
+	public Long getAuthorId() {
 		return authorId;
 	}
 
-	public void setAuthorId(String authorId) {
-		this.authorId = authorId;
-	}
+//	public void setAuthorId(Long authorId) {
+//		this.authorId = authorId;
+//	}
 
 	public String getImageUrl() {
 		return imageUrl;

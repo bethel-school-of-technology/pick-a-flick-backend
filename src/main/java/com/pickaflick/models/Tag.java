@@ -16,7 +16,7 @@ public class Tag implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long tagId;
-	private int authorId;
+	private final Long authorId;
 	private String tagName;
 	
 //	Creates Many to Many relationship between Movies and Tags
@@ -24,11 +24,13 @@ public class Tag implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "tags")
 	private Set<Movie> movies = new HashSet<>();
 
+	// need to find a way to set this equal to the userId...
 	public Tag() {
+		this.authorId = 1L;
 		
 	}
 	
-	public Tag(Long tagId, int authorId, String tagName) {
+	public Tag(Long tagId, Long authorId, String tagName) {
 		
 		this.tagId = tagId;
 		this.authorId = authorId;
@@ -43,13 +45,13 @@ public class Tag implements Serializable {
 		this.tagId = tagId;
 	}
 
-	public int getAuthorId() {
+	public Long getAuthorId() {
 		return authorId;
 	}
 
-	public void setAuthorId(int authorId) {
-		this.authorId = authorId;
-	}
+//	public void setAuthorId(Long authorId) {
+//		this.authorId = authorId;
+//	}
 
 	public String getTagName() {
 		return tagName;
