@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.pickaflick.exceptions.NotFoundException;
 import com.pickaflick.models.Movie;
+import com.pickaflick.models.Tag;
 import com.pickaflick.repos.IMovieRepo;
 
 @Service
@@ -25,6 +26,10 @@ public class MovieService {
 	
 	public Movie findMovieById(Long id) {
 		return movieRepo.findById(id).orElseThrow(() -> new NotFoundException("Movie by id " + id + " was not found."));
+	}
+	
+	public List<Movie> findMoviesByTag(Tag tag) {
+		return movieRepo.findByTags(tag);
 	}
 	
 	// Comments from Jared's original code:

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import com.pickaflick.models.Tag;
 import com.pickaflick.services.MovieService;
 import com.pickaflick.services.TagService;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
@@ -46,6 +48,16 @@ public class MovieController {
 		 return new ResponseEntity<>(movie, HttpStatus.OK);
 	}
 	
+//	@GetMapping("/find/tags?tagId={tagId}")   <- this doesn't work...was hoping everything after the ? would be optional but it errors.
+	@GetMapping("/find/tag/{tagId}")
+	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId) {
+		// take the tagId from the route & find that tag
+		Tag tag = tagService.findTagById(tagId);
+		// take that tag and use it to find all movies with that tag
+		List<Movie> movies = movieService.findMoviesByTag(tag);
+		return new ResponseEntity<>(movies, HttpStatus.OK);
+	}
+		
 	@PostMapping("/add")
 	public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
 		Movie newMovie = movieService.addMovie(movie);
