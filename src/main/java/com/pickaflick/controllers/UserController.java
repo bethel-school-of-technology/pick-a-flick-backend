@@ -21,8 +21,9 @@ import com.pickaflick.services.UserService;
 @RequestMapping("/api/users")
 public class UserController {
 	
-	@Autowired
-	private final UserService userService;
+
+	 @Autowired
+	  private UserService userService;
 
 	public UserController(UserService userService) {
 		this.userService = userService;
