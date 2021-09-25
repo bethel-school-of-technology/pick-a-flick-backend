@@ -52,11 +52,7 @@ public class UserService implements UserDetailsService{
 		authList.add(new SimpleGrantedAuthority("ROLE_USER"));
 		return authList;
 	}
-	//added code below.
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-	    return new BCryptPasswordEncoder();
-	}
+
 
 	
 	public List<User> findAllUsers() {
