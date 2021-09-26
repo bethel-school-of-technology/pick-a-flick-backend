@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,8 +43,8 @@ public class UserController {
 	}
 
 	@PostMapping("/add")
-	public ResponseEntity<User> addUser(@RequestBody User user) {
-		User newUser = userService.addUser(user);
+	public ResponseEntity<UserDetails> registerUser(@RequestBody User user) {
+		UserDetails newUser = userService.addUser(user);
 		return new ResponseEntity<>(newUser, HttpStatus.CREATED);
 	}
 
