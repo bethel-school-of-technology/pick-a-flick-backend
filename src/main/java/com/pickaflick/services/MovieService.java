@@ -32,14 +32,7 @@ public class MovieService {
 		return movieRepo.findByTags(tag);
 	}
 	
-	// Comments from Jared's original code:
-	
-	// SetMovieId needs to be Long for it to be a many to many. I have used setMovieTitle, 
-	// but this may need to be changed.
-	// Above comments were for previous code that is commented out below under addMovie() - not sure if we need to do this or not.
 	public Movie addMovie(Movie movie) {
-		// Don't think we need this, but didn't want to delete just in case...
-		// movies.setMovieTitle(UUID.randomUUID().toString());
 		return movieRepo.save(movie);
 	}
 	

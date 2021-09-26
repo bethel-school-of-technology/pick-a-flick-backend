@@ -1,5 +1,6 @@
 package com.pickaflick.controllers;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
+import com.pickaflick.models.User;
 import com.pickaflick.services.MovieService;
 import com.pickaflick.services.TagService;
+import com.pickaflick.services.UserService;
 
 @CrossOrigin
 @RestController
@@ -30,10 +33,15 @@ public class MovieController {
 	
 	@Autowired
 	private final TagService tagService;
+	
+	@Autowired
+	private final UserService userService;
 
-	public MovieController(MovieService movieService, TagService tagService) {
+	// imported userService for authorId:
+	public MovieController(MovieService movieService, TagService tagService, UserService userService) {
 		this.movieService = movieService;
 		this.tagService = tagService;
+		this.userService = userService;
 	}
 	
 	@GetMapping("/all")
@@ -57,17 +65,35 @@ public class MovieController {
 		List<Movie> movies = movieService.findMoviesByTag(tag);
 		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
-		
+	
 	@PostMapping("/add")
-	public ResponseEntity<Movie> addMovie(@RequestBody Movie movie) {
+	public ResponseEntity<Movie> addMovie(@RequestBody Movie movie, Principal principal) {
+		// gets the name from the principal, which is the username
+		String username = principal.getName();
+		// gets the whole user profile from the username
+		User currentUser = userService.getUserByUsername(username);
+		// gets the userId from the user profile
+		Long currentId = currentUser.getUserId();
+		// sets the authorId to the userId
+		movie.setAuthorId(currentId);
+		// then saves the new movie
 		Movie newMovie = movieService.addMovie(movie);
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/update/{id}")
-	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie) {
-		 Movie updateMovie = movieService.updateMovie(movie);
-		 return new ResponseEntity<>(updateMovie, HttpStatus.OK);
+	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie, Principal principal) { 
+		// gets the name from the principal, which is the username
+		String username = principal.getName();
+		// gets the whole user profile from the username
+		User currentUser = userService.getUserByUsername(username);
+		// gets the userId from the user profile
+		Long currentId = currentUser.getUserId();
+		// sets the authorId to the userId
+		movie.setAuthorId(currentId);
+		// then saves the movie with updated info
+		Movie updateMovie = movieService.updateMovie(movie);
+		return new ResponseEntity<>(updateMovie, HttpStatus.OK);
 	}
 	
 	// For Many to Many Relationship - attaches tag to movie
