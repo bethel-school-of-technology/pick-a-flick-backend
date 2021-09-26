@@ -34,7 +34,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http.cors()
       .and()
       .csrf().disable()
-      .authorizeRequests().antMatchers(HttpMethod.POST, "SIGN_UP_URL").permitAll()
+      .authorizeRequests()
+//      change back to this when we are done testing..."/**" allows all testing without passing auth tokens:
+//      .antMatchers(HttpMethod.POST, "SIGN_UP_URL").permitAll()   
+      .antMatchers("/**").permitAll()
       .anyRequest().authenticated()
       .and()
       .addFilter(new JWTAuthenticationFilter(authenticationManager()))

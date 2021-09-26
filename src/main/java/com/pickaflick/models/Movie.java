@@ -27,7 +27,8 @@ public class Movie implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(nullable = false, updatable = false)
 	private Long movieId;
-	private final Long authorId;
+	@Column(nullable = false, updatable = false)
+	private Long authorId;
 	private String imageUrl;
 	private String movieTitle;
 	private int year;
@@ -47,7 +48,7 @@ public class Movie implements Serializable {
 
 	// need to find a way to set this equal to the userId...
 	public Movie() {
-		this.authorId = 1L;
+
 	}
 	
 	public Movie(Long movieId, Long authorId, String imageUrl, String movieTitle, int year, int runTimeInMinutes,

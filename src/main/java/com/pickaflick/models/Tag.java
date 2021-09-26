@@ -16,7 +16,8 @@ public class Tag implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long tagId;
-	private final Long authorId;
+	@Column(nullable = false, updatable = false)
+	private Long authorId;
 	private String tagName;
 	
 //	Creates Many to Many relationship between Movies and Tags
@@ -26,7 +27,6 @@ public class Tag implements Serializable {
 
 	// need to find a way to set this equal to the userId...
 	public Tag() {
-		this.authorId = 1L;
 		
 	}
 	
