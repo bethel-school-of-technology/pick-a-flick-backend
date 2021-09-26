@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.pickaflick.exceptions.AlreadyExistsException;
 import com.pickaflick.exceptions.NotFoundException;
 import com.pickaflick.models.User;
 import com.pickaflick.repos.IUserRepo;
@@ -42,9 +43,17 @@ public class UserService implements UserDetailsService{
 	}
 
 	public UserDetails addUser(User newUser) {
-		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-		User savedUser = userRepo.save(newUser);
-		return new org.springframework.security.core.userdetails.User(savedUser.getUsername(), savedUser.getPassword(), getAuthorities());
+		String newUsername = newUser.getUsername();
+		User existingUser = userRepo.findByUsername(newUsername);
+		if (existingUser == null) {
+			newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+			User savedUser = userRepo.save(newUser);
+			return new org.springframework.security.core.userdetails.User(savedUser.getUsername(), savedUser.getPassword(), getAuthorities());
+		}
+		else {
+			throw new AlreadyExistsException("Username " + newUsername + " already exists.");
+		}
+
 	}
 	
 	private List<SimpleGrantedAuthority> getAuthorities() {
