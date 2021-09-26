@@ -25,9 +25,8 @@ public class Tag implements Serializable {
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "tags")
 	private Set<Movie> movies = new HashSet<>();
 
-	// need to find a way to set this equal to the userId...
 	public Tag() {
-		
+
 	}
 	
 	public Tag(Long tagId, Long authorId, String tagName) {
@@ -49,9 +48,9 @@ public class Tag implements Serializable {
 		return authorId;
 	}
 
-//	public void setAuthorId(Long authorId) {
-//		this.authorId = authorId;
-//	}
+	public void setAuthorId(Long authorId) {
+		this.authorId = authorId;
+	}
 
 	public String getTagName() {
 		return tagName;

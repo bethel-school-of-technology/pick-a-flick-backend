@@ -1,16 +1,5 @@
 package com.pickaflick.models;
 
-////Add these 2 back in to pom.xml/remove to test without security errors:
-//<dependency>
-//<groupId>org.springframework.boot</groupId>
-//<artifactId>spring-boot-starter-security</artifactId>
-//</dependency>
-//<dependency>
-//<groupId>org.springframework.security</groupId>
-//<artifactId>spring-security-test</artifactId>
-//<scope>test</scope>
-//</dependency>
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +35,6 @@ public class Movie implements Serializable {
 		)
 	private Set<Tag> tags = new HashSet<>();
 
-	// need to find a way to set this equal to the userId...
 	public Movie() {
 
 	}
@@ -77,9 +65,9 @@ public class Movie implements Serializable {
 		return authorId;
 	}
 
-//	public void setAuthorId(Long authorId) {
-//		this.authorId = authorId;
-//	}
+	public void setAuthorId(Long authorId) {
+		this.authorId = authorId;
+	}
 
 	public String getImageUrl() {
 		return imageUrl;
