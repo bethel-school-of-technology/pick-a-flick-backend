@@ -36,8 +36,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       .csrf().disable()
       .authorizeRequests()
 //      change back to this when we are done testing..."/**" allows all testing without passing auth tokens:
-      .antMatchers(HttpMethod.POST, "SIGN_UP_URL").permitAll()   
-//      .antMatchers("/**").permitAll()
+//      .antMatchers(HttpMethod.POST, "SIGN_UP_URL").permitAll()   
+      .antMatchers("/**").permitAll()
       .anyRequest().authenticated()
       .and()
       .addFilter(new JWTAuthenticationFilter(authenticationManager()))
@@ -45,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
   }
 
- /* @Bean
+  @Bean
   CorsConfigurationSource corsConfigurationSource() {
     final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration corsConfig = new CorsConfiguration();
@@ -53,5 +53,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     corsConfig.setExposedHeaders(Arrays.asList("Authorization"));
     source.registerCorsConfiguration("/**", corsConfig);
     return source;
-  }*/
+  }
 }
