@@ -1,5 +1,6 @@
 package com.pickaflick.services;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,15 +18,15 @@ import com.pickaflick.models.User;
 import com.pickaflick.repos.IUserRepo;
 
 @Service
-public class UserService implements UserDetailsService{
-	
+public class UserService implements UserDetailsService {
+
 	private final IUserRepo userRepo;
-	
+
 	@Autowired
 	public UserService(IUserRepo userRepo) {
 		this.userRepo = userRepo;
 	}
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -35,11 +36,22 @@ public class UserService implements UserDetailsService{
 		if (user == null) {
 			throw new UsernameNotFoundException(username);
 		}
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthorities());
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+				getAuthorities());
 	}
-	
+
 	public User getUserByUsername(String username) {
 		return userRepo.findByUsername(username);
+	}
+
+	public Long getUserIdFromPrincipal(Principal principal) {
+		// gets the name from the principal, which is the username
+		String username = principal.getName();
+		// gets the whole user profile from the username
+		User currentUser = this.getUserByUsername(username);
+		// gets the userId from the user profile
+		Long currentId = currentUser.getUserId();
+		return currentId;
 	}
 
 	public UserDetails addUser(User newUser) {
@@ -48,14 +60,13 @@ public class UserService implements UserDetailsService{
 		if (existingUser == null) {
 			newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 			User savedUser = userRepo.save(newUser);
-			return new org.springframework.security.core.userdetails.User(savedUser.getUsername(), savedUser.getPassword(), getAuthorities());
-		}
-		else {
+			return new org.springframework.security.core.userdetails.User(savedUser.getUsername(),
+					savedUser.getPassword(), getAuthorities());
+		} else {
 			throw new AlreadyExistsException("Username " + newUsername + " already exists.");
 		}
-
 	}
-	
+
 	private List<SimpleGrantedAuthority> getAuthorities() {
 		List<SimpleGrantedAuthority> authList = new ArrayList<>();
 		authList.add(new SimpleGrantedAuthority("ROLE_USER"));
@@ -65,18 +76,16 @@ public class UserService implements UserDetailsService{
 	public List<User> findAllUsers() {
 		return userRepo.findAll();
 	}
-	
+
 	public User findUserById(Long id) {
 		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User by id " + id + " was not found."));
 	}
-	
+
 	public User updateUser(User user) {
 		return userRepo.save(user);
 	}
-	
+
 	public void deleteUser(Long id) {
 		userRepo.deleteById(id);
 	}
-	
 }
-
