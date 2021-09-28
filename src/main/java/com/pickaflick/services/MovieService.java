@@ -32,6 +32,10 @@ public class MovieService {
 		return movieRepo.findByTags(tag);
 	}
 	
+	public List<Movie> findMoviesByAuthorId(Long id) {
+		return movieRepo.findByAuthorId(id);
+	}
+	
 	public Movie addMovie(Movie movie) {
 		return movieRepo.save(movie);
 	}

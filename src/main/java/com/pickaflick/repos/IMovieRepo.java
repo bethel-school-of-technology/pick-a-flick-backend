@@ -12,6 +12,9 @@ public interface IMovieRepo extends JpaRepository<Movie, Long> {
 	
 	@Query
 	List<Movie> findByTags(Tag tag);
+	
+	@Query
+	List<Movie> findByAuthorId(Long authorId);
 
 }
 
