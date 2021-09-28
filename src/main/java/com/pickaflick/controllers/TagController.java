@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
 import com.pickaflick.models.User;
 import com.pickaflick.services.TagService;
@@ -37,10 +38,22 @@ public class TagController {
 		this.userService = userService;
 	}
 	
+//	@GetMapping("/all")
+//	public ResponseEntity<List<Tag>> getAllTags() {
+//		 List<Tag> tags = tagService.findAllTags();
+//		 return new ResponseEntity<>(tags, HttpStatus.OK);
+//	}
+	
 	@GetMapping("/all")
-	public ResponseEntity<List<Tag>> getAllTags() {
-		 List<Tag> tags = tagService.findAllTags();
-		 return new ResponseEntity<>(tags, HttpStatus.OK);
+	public ResponseEntity<List<Tag>> getAllTags(Principal principal) {
+		// gets the name from the principal, which is the username
+		String username = principal.getName();
+		// gets the whole user profile from the username
+		User currentUser = userService.getUserByUsername(username);
+		// gets the userId from the user profile, which is the authorId
+		Long authorId = currentUser.getUserId();
+		List<Tag> tags = tagService.findTagsByAuthorId(authorId);
+		return new ResponseEntity<>(tags, HttpStatus.OK);
 	}
 
 	@GetMapping("/find/{id}")

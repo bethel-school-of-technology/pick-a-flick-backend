@@ -37,17 +37,28 @@ public class MovieController {
 	@Autowired
 	private final UserService userService;
 
-	// imported userService for authorId:
 	public MovieController(MovieService movieService, TagService tagService, UserService userService) {
 		this.movieService = movieService;
 		this.tagService = tagService;
 		this.userService = userService;
 	}
 	
+//	@GetMapping("/all")
+//	public ResponseEntity<List<Movie>> getAllMovies() {
+//		 List<Movie> movies = movieService.findAllMovies();
+//		 return new ResponseEntity<>(movies, HttpStatus.OK);
+//	}
+	
 	@GetMapping("/all")
-	public ResponseEntity<List<Movie>> getAllMovies() {
-		 List<Movie> movies = movieService.findAllMovies();
-		 return new ResponseEntity<>(movies, HttpStatus.OK);
+	public ResponseEntity<List<Movie>> getAllMovies(Principal principal) {
+		// gets the name from the principal, which is the username
+		String username = principal.getName();
+		// gets the whole user profile from the username
+		User currentUser = userService.getUserByUsername(username);
+		// gets the userId from the user profile, which is the authorId
+		Long authorId = currentUser.getUserId();
+		List<Movie> movies = movieService.findMoviesByAuthorId(authorId);
+		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
 
 	@GetMapping("/find/{id}")

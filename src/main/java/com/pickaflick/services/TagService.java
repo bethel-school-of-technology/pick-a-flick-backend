@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pickaflick.exceptions.NotFoundException;
+import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
 import com.pickaflick.repos.ITagRepo;
 
@@ -27,14 +28,11 @@ public class TagService {
 		return tagRepo.findById(id).orElseThrow(() -> new NotFoundException("Tag by id " + id + " was not found."));
 	}
 	
-	// Comments from Jared's original code:
+	public List<Tag> findTagsByAuthorId(Long id) {
+		return tagRepo.findByAuthorId(id);
+	}
 	
-	// SetTagId needs to be Long for it to be a many to many. I have used setTagName, 
-	// but this may need to be changed.
-	// Above comments were for previous code that is commented out below under addTag() - not sure if we need to do this or not.
 	public Tag addTag(Tag tag) {
-		// Don't think we need this, but didn't want to delete just in case...
-		// tags.setTagName(UUID.randomUUID().toString());
 		return tagRepo.save(tag);
 	}
 	
