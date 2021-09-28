@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pickaflick.models.Movie;
+import com.pickaflick.exceptions.UnauthorizedException;
 import com.pickaflick.models.Tag;
 import com.pickaflick.models.User;
 import com.pickaflick.services.TagService;
@@ -26,72 +26,114 @@ import com.pickaflick.services.UserService;
 @RestController
 @RequestMapping("/api/tags")
 public class TagController {
-	
+
 	@Autowired
 	private final TagService tagService;
-	
+
 	@Autowired
 	private final UserService userService;
-	
+
 	public TagController(TagService tagService, UserService userService) {
 		this.tagService = tagService;
 		this.userService = userService;
 	}
-	
+
 //	@GetMapping("/all")
 //	public ResponseEntity<List<Tag>> getAllTags() {
 //		 List<Tag> tags = tagService.findAllTags();
 //		 return new ResponseEntity<>(tags, HttpStatus.OK);
 //	}
-	
+
 	@GetMapping("/all")
 	public ResponseEntity<List<Tag>> getAllTags(Principal principal) {
-		// gets the name from the principal, which is the username
-		String username = principal.getName();
-		// gets the whole user profile from the username
-		User currentUser = userService.getUserByUsername(username);
-		// gets the userId from the user profile, which is the authorId
-		Long authorId = currentUser.getUserId();
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		Long authorId = currentUserId;
 		List<Tag> tags = tagService.findTagsByAuthorId(authorId);
 		return new ResponseEntity<>(tags, HttpStatus.OK);
 	}
 
+//	@GetMapping("/find/{id}")
+//	public ResponseEntity<Tag> getTagById(@PathVariable("id") Long id) {
+//		 Tag tag = tagService.findTagById(id);
+//		 return new ResponseEntity<>(tag, HttpStatus.OK);
+//	}
+
 	@GetMapping("/find/{id}")
-	public ResponseEntity<Tag> getTagById(@PathVariable("id") Long id) {
-		 Tag tag = tagService.findTagById(id);
-		 return new ResponseEntity<>(tag, HttpStatus.OK);
+	public ResponseEntity<Tag> getTagById(@PathVariable("id") Long id, Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+
+		Tag tag = tagService.findTagById(id);
+
+		if (tag.getAuthorId() == currentUserId) {
+			return new ResponseEntity<>(tag, HttpStatus.OK);
+		} 
+		else {
+			throw new UnauthorizedException("User is not authorized to access.");
+		}
 	}
-	
+
 	@PostMapping("/add")
 	public ResponseEntity<Tag> addTag(@RequestBody Tag tag, Principal principal) {
-		
-		String username = principal.getName();
-		User currentUser = userService.getUserByUsername(username);
-		Long currentId = currentUser.getUserId();
-		tag.setAuthorId(currentId);
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		tag.setAuthorId(currentUserId);
 		Tag newTag = tagService.addTag(tag);
 		return new ResponseEntity<>(newTag, HttpStatus.CREATED);
 	}
-	
+
+//	@PutMapping("/update/{id}")
+//	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) { 
+//		// gets the name from the principal, which is the username
+//		String username = principal.getName();
+//		// gets the whole user profile from the username
+//		User currentUser = userService.getUserByUsername(username);
+//		// gets the userId from the user profile
+//		Long currentId = currentUser.getUserId();
+//		// sets the authorId to the userId
+//		tag.setAuthorId(currentId);
+//		// then saves the movie with updated info
+//		Tag updateTag = tagService.updateTag(tag);
+//		return new ResponseEntity<>(updateTag, HttpStatus.OK);
+//	}
+
 	@PutMapping("/update/{id}")
-	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) { 
-		// gets the name from the principal, which is the username
-		String username = principal.getName();
-		// gets the whole user profile from the username
-		User currentUser = userService.getUserByUsername(username);
-		// gets the userId from the user profile
-		Long currentId = currentUser.getUserId();
-		// sets the authorId to the userId
-		tag.setAuthorId(currentId);
-		// then saves the movie with updated info
-		Tag updateTag = tagService.updateTag(tag);
-		return new ResponseEntity<>(updateTag, HttpStatus.OK);
+	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		// gets the tag by the id passed in
+		Tag tagById = tagService.findTagById(id);
+		// gets the authorId of that tag
+		Long tagAuthorId = tagById.getAuthorId();
+
+		if (currentUserId == tagAuthorId) {
+			// sets the authorId to the userId
+			tag.setAuthorId(currentUserId);
+			// then saves the tag with updated info
+			Tag updateTag = tagService.updateTag(tag);
+			return new ResponseEntity<>(updateTag, HttpStatus.OK);
+		} else {
+			throw new UnauthorizedException("User is not authorized to access.");
+		}
 	}
 
+//	@DeleteMapping("/delete/{id}")
+//	public ResponseEntity<?> deleteTag(@PathVariable("id") Long id) {
+//		 tagService.deleteTag(id);
+//		 return new ResponseEntity<>(HttpStatus.OK);
+//	}
+
 	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<?> deleteTag(@PathVariable("id") Long id) {
+	public ResponseEntity<?> deleteTag(@PathVariable("id") Long id, Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		// gets the tag by the id passed in
+		Tag tagById = tagService.findTagById(id);
+		// gets the authorId of that tag
+		Long tagAuthorId = tagById.getAuthorId();
+		
+		if(currentUserId == tagAuthorId) {
 		 tagService.deleteTag(id);
 		 return new ResponseEntity<>(HttpStatus.OK);
+		}
+		else {
+			throw new UnauthorizedException("User is not authorized to access.");
+		}
 	}
-	
 }

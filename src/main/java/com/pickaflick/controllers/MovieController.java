@@ -1,6 +1,7 @@
 package com.pickaflick.controllers;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pickaflick.exceptions.UnauthorizedException;
 import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
 import com.pickaflick.models.User;
@@ -27,13 +29,13 @@ import com.pickaflick.services.UserService;
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
-	
+
 	@Autowired
 	private final MovieService movieService;
-	
+
 	@Autowired
 	private final TagService tagService;
-	
+
 	@Autowired
 	private final UserService userService;
 
@@ -42,31 +44,38 @@ public class MovieController {
 		this.tagService = tagService;
 		this.userService = userService;
 	}
-	
+
 //	@GetMapping("/all")
 //	public ResponseEntity<List<Movie>> getAllMovies() {
 //		 List<Movie> movies = movieService.findAllMovies();
 //		 return new ResponseEntity<>(movies, HttpStatus.OK);
 //	}
-	
+
 	@GetMapping("/all")
 	public ResponseEntity<List<Movie>> getAllMovies(Principal principal) {
-		// gets the name from the principal, which is the username
-		String username = principal.getName();
-		// gets the whole user profile from the username
-		User currentUser = userService.getUserByUsername(username);
-		// gets the userId from the user profile, which is the authorId
-		Long authorId = currentUser.getUserId();
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		Long authorId = currentUserId;
 		List<Movie> movies = movieService.findMoviesByAuthorId(authorId);
 		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
 
+//	@GetMapping("/find/{id}")
+//	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id) {
+//		 Movie movie = movieService.findMovieById(id);
+//		 return new ResponseEntity<>(movie, HttpStatus.OK);
+//	}
+
 	@GetMapping("/find/{id}")
-	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id) {
-		 Movie movie = movieService.findMovieById(id);
-		 return new ResponseEntity<>(movie, HttpStatus.OK);
+	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id, Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		Movie movie = movieService.findMovieById(id);
+		if (movie.getAuthorId() == currentUserId) {
+			return new ResponseEntity<>(movie, HttpStatus.OK);
+		} else {
+			throw new UnauthorizedException("User is not authorized to access.");
+		}
 	}
-	
+
 //	@GetMapping("/find/tags?tagId={tagId}")   <- this doesn't work...was hoping everything after the ? would be optional but it errors.
 	@GetMapping("/find/tag/{tagId}")
 	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId) {
@@ -77,36 +86,72 @@ public class MovieController {
 		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
 	
+	// trying to figure out how to only pull tagged movies that match the userId/authorId...
+//	@GetMapping("/find/tag/{tagId}")
+//	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
+//		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+//		// take the tagId from the route & find that tag
+//		Tag tag = tagService.findTagById(tagId);
+//		// take that tag and use it to find all movies with that tag
+//		List<Movie> movies = movieService.findMoviesByTag(tag);
+//		ArrayList<Movie> moviesArray = new ArrayList<Movie>(movies);
+//		for(int i = 0; i < moviesArray.size(); i++) {
+//			Array<Movie> taggedMovies;
+//			if (moviesArray[i].authorId == currentUserId) {
+//				taggedMovies.push(moviesArray[i]);
+//			}
+//			return taggedMovies;
+//		}
+//		
+//		return new ResponseEntity<>(movies, HttpStatus.OK);
+//	}
+
 	@PostMapping("/add")
 	public ResponseEntity<Movie> addMovie(@RequestBody Movie movie, Principal principal) {
-		// gets the name from the principal, which is the username
-		String username = principal.getName();
-		// gets the whole user profile from the username
-		User currentUser = userService.getUserByUsername(username);
-		// gets the userId from the user profile
-		Long currentId = currentUser.getUserId();
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
 		// sets the authorId to the userId
-		movie.setAuthorId(currentId);
+		movie.setAuthorId(currentUserId);
 		// then saves the new movie
 		Movie newMovie = movieService.addMovie(movie);
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 
+//	@PutMapping("/update/{id}")
+//	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie,
+//			Principal principal) {
+//		// gets the name from the principal, which is the username
+//		String username = principal.getName();
+//		// gets the whole user profile from the username
+//		User currentUser = userService.getUserByUsername(username);
+//		// gets the userId from the user profile
+//		Long currentId = currentUser.getUserId();
+//		// sets the authorId to the userId
+//		movie.setAuthorId(currentId);
+//		// then saves the movie with updated info
+//		Movie updateMovie = movieService.updateMovie(movie);
+//		return new ResponseEntity<>(updateMovie, HttpStatus.OK);
+//	}
+
 	@PutMapping("/update/{id}")
-	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie, Principal principal) { 
-		// gets the name from the principal, which is the username
-		String username = principal.getName();
-		// gets the whole user profile from the username
-		User currentUser = userService.getUserByUsername(username);
-		// gets the userId from the user profile
-		Long currentId = currentUser.getUserId();
-		// sets the authorId to the userId
-		movie.setAuthorId(currentId);
-		// then saves the movie with updated info
-		Movie updateMovie = movieService.updateMovie(movie);
-		return new ResponseEntity<>(updateMovie, HttpStatus.OK);
+	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie,
+			Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		// gets the movie by the id passed in
+		Movie movieById = movieService.findMovieById(id);
+		// gets the authorId of that movie
+		Long movieAuthorId = movieById.getAuthorId();
+
+		if (currentUserId == movieAuthorId) {
+			// sets the authorId to the userId
+			movie.setAuthorId(currentUserId);
+			// then saves the movie with updated info
+			Movie updateMovie = movieService.updateMovie(movie);
+			return new ResponseEntity<>(updateMovie, HttpStatus.OK);
+		} else {
+			throw new UnauthorizedException("User is not authorized to access.");
+		}
 	}
-	
+
 	// For Many to Many Relationship - attaches tag to movie
 //	@PutMapping("/{movieId}/tags/{tagId}")
 //	public ResponseEntity<Movie> attachTagToMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
@@ -126,10 +171,26 @@ public class MovieController {
 //		return new ResponseEntity<>(untaggedMovie, HttpStatus.OK);
 //	}
 
-	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<?> deleteMovie(@PathVariable("id") Long id) {
-		movieService.deleteMovie(id);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}	
+//	@DeleteMapping("/delete/{id}")
+//	public ResponseEntity<?> deleteMovie(@PathVariable("id") Long id) {
+//		movieService.deleteMovie(id);
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
 	
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<?> deleteMovie(@PathVariable("id") Long id, Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		// gets the movie by the id passed in
+		Movie movieById = movieService.findMovieById(id);
+		// gets the authorId of that movie
+		Long movieAuthorId = movieById.getAuthorId();
+		
+		if(currentUserId == movieAuthorId) {
+		 movieService.deleteMovie(id);
+		 return new ResponseEntity<>(HttpStatus.OK);
+		}
+		else {
+			throw new UnauthorizedException("User is not authorized to access.");
+		}
+	}
 }
