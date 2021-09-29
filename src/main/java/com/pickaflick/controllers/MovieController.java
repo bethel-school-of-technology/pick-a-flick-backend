@@ -76,24 +76,64 @@ public class MovieController {
 		}
 	}
 
+	// my working original code, but it returns ALL tagged movies, regardless of authorId
 //	@GetMapping("/find/tags?tagId={tagId}")   <- this doesn't work...was hoping everything after the ? would be optional but it errors.
-	@GetMapping("/find/tag/{tagId}")
-	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId) {
-		// take the tagId from the route & find that tag
-		Tag tag = tagService.findTagById(tagId);
-		// take that tag and use it to find all movies with that tag
-		List<Movie> movies = movieService.findMoviesByTag(tag);
-		return new ResponseEntity<>(movies, HttpStatus.OK);
-	}
-	
-	// trying to figure out how to only pull tagged movies that match the userId/authorId...
 //	@GetMapping("/find/tag/{tagId}")
-//	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
-//		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+//	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId) {
 //		// take the tagId from the route & find that tag
 //		Tag tag = tagService.findTagById(tagId);
 //		// take that tag and use it to find all movies with that tag
 //		List<Movie> movies = movieService.findMoviesByTag(tag);
+//		return new ResponseEntity<>(movies, HttpStatus.OK);
+//	}
+	
+	// This works!
+	@GetMapping("/find/tag/{tagId}")
+	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		// take the tagId from the route & find that tag
+		Tag tag = tagService.findTagById(tagId);
+		// get the authorId of that tag
+		Long tagAuthorId = tag.getAuthorId();
+		// if the tag's authorId doesn't match the currentUserId, throw an error
+		if(tagAuthorId != currentUserId) {
+			throw new UnauthorizedException("User is not authorized to access.");
+		}
+		// else, use that tag to find all the movies with that tag
+		else {
+			// take that tag and use it to find all movies with that tag
+			List<Movie> taggedMovies = movieService.findMoviesByTag(tag);
+			// create var to hold user's tagged movies (tagged movies that match the author/userId)
+			ArrayList<Movie> myTaggedMovies = new ArrayList<Movie>();
+			// loop through the array list and add every movie with an authorId that matches the current user Id to my newly created var
+			for(Movie movie : taggedMovies) {
+				if (movie.getAuthorId() == currentUserId) {
+					myTaggedMovies.add(movie);
+				}
+			}
+			return new ResponseEntity<>(myTaggedMovies, HttpStatus.OK);
+		}
+	}
+	
+	// still trying...another approach...
+//	@GetMapping("/find/tag/{tagId}")
+//	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
+//		// Get the current user's id, which is the authorId for all their movies
+//		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+//		
+//		// Get all the movies with that authorId
+//		Long authorId = currentUserId;
+//		List<Movie> allMovies = movieService.findMoviesByAuthorId(authorId);
+//		
+//		// make allMovies into an array list
+//		
+//		
+//		// take the tagId from the route & find that tag
+//		Tag tag = tagService.findTagById(tagId);
+//		
+//		// take that tag and use it to find all movies with that tag...how to make this method run on just allMovies instead of the movieRepo?  Is this possible?
+//		List<Movie> taggedMovies = allMovies.movieService.findMoviesByTag(tag);
+//		
 //		ArrayList<Movie> moviesArray = new ArrayList<Movie>(movies);
 //		for(int i = 0; i < moviesArray.size(); i++) {
 //			Array<Movie> taggedMovies;
@@ -153,14 +193,14 @@ public class MovieController {
 	}
 
 	// For Many to Many Relationship - attaches tag to movie
-//	@PutMapping("/{movieId}/tags/{tagId}")
-//	public ResponseEntity<Movie> attachTagToMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
-//		Movie movie = movieService.findMovieById(movieId);
-//		Tag tag = tagService.findTagById(tagId);
-//		movie.attachTag(tag);
-//		Movie taggedMovie = movieService.addMovie(movie);
-//		return new ResponseEntity<>(taggedMovie, HttpStatus.OK);
-//	}
+	@PutMapping("/{movieId}/tags/{tagId}")
+	public ResponseEntity<Movie> attachTagToMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
+		Movie movie = movieService.findMovieById(movieId);
+		Tag tag = tagService.findTagById(tagId);
+		movie.attachTag(tag);
+		Movie taggedMovie = movieService.addMovie(movie);
+		return new ResponseEntity<>(taggedMovie, HttpStatus.OK);
+	}
 //	
 //	@PutMapping("/{movieId}/tags/remove/{tagId}")
 //	public ResponseEntity<Movie> removeTagFromMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
