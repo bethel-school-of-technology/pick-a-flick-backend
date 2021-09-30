@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.*;
 
 import com.pickaflick.services.UserService;
@@ -36,8 +37,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       .csrf().disable()
       .authorizeRequests()
 //      change back to this when we are done testing..."/**" allows all testing without passing auth tokens:
-//      .antMatchers(HttpMethod.POST, "SIGN_UP_URL").permitAll()   
-      .antMatchers("/**").permitAll()
+      .antMatchers(HttpMethod.POST, "SIGN_UP_URL").permitAll()   
+//      .antMatchers("/**").permitAll()
       .anyRequest().authenticated()
       .and()
       .addFilter(new JWTAuthenticationFilter(authenticationManager()))
@@ -52,6 +53,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfiguration corsConfig = new CorsConfiguration();
     corsConfig.applyPermitDefaultValues();
     corsConfig.setExposedHeaders(Arrays.asList("Authorization"));
+    corsConfig.addAllowedMethod("DELETE");
+    corsConfig.addAllowedMethod("PUT");
+    corsConfig.addAllowedMethod("POST");
+    corsConfig.addAllowedMethod("GET");
+    corsConfig.addAllowedOrigin("*");
     source.registerCorsConfiguration("/**", corsConfig);
     return source;
   }
