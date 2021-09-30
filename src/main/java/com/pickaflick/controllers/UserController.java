@@ -1,5 +1,6 @@
 package com.pickaflick.controllers;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,14 @@ public class UserController {
 	@GetMapping("/find/{id}")
 	public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
 		User user = userService.findUserById(id);
+		return new ResponseEntity<>(user, HttpStatus.OK);
+	}
+
+	@GetMapping("/find/username")
+	public ResponseEntity<User> getUserByUsername(Principal principal) {
+		// gets the name from the principal, which is the username
+		String username = principal.getName();
+		User user = userService.findUserByUsername(username);
 		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 

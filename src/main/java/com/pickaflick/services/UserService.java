@@ -40,7 +40,7 @@ public class UserService implements UserDetailsService {
 				getAuthorities());
 	}
 
-	public User getUserByUsername(String username) {
+	public User findUserByUsername(String username) {
 		return userRepo.findByUsername(username);
 	}
 
@@ -48,7 +48,7 @@ public class UserService implements UserDetailsService {
 		// gets the name from the principal, which is the username
 		String username = principal.getName();
 		// gets the whole user profile from the username
-		User currentUser = this.getUserByUsername(username);
+		User currentUser = this.findUserByUsername(username);
 		// gets the userId from the user profile
 		Long currentId = currentUser.getUserId();
 		return currentId;
