@@ -2,6 +2,7 @@ package com.pickaflick.controllers;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,23 @@ public class MovieController {
 		List<Movie> movies = movieService.findMoviesByAuthorId(authorId);
 		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
+	
+	// returns 10 most recently added movies
+	@GetMapping("/recent")
+	public ResponseEntity<List<Movie>> getRecentMovies(Principal principal) {
+		Long currentUserId = userService.getUserIdFromPrincipal(principal);
+		Long authorId = currentUserId;
+		List<Movie> movies = movieService.findMoviesByAuthorId(authorId);
+		if(movies.size() > 10) {
+			List<Movie> recentMovies = movies.subList(movies.size()-10, movies.size());
+			Collections.reverse(recentMovies);
+			return new ResponseEntity<>(recentMovies, HttpStatus.OK);
+		}
+		else {
+			Collections.reverse(movies);
+			return new ResponseEntity<>(movies, HttpStatus.OK);
+		}
+	}
 
 //	@GetMapping("/find/{id}")
 //	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id) {
@@ -104,7 +122,7 @@ public class MovieController {
 			// take that tag and use it to find all movies with that tag
 			List<Movie> taggedMovies = movieService.findMoviesByTag(tag);
 			// create var to hold user's tagged movies (tagged movies that match the author/userId)
-			ArrayList<Movie> myTaggedMovies = new ArrayList<Movie>();
+			List<Movie> myTaggedMovies = new ArrayList<Movie>();
 			// loop through the array list and add every movie with an authorId that matches the current user Id to my newly created var
 			for(Movie movie : taggedMovies) {
 				if (movie.getAuthorId() == currentUserId) {
