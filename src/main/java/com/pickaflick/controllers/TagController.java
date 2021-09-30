@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pickaflick.exceptions.UnauthorizedException;
+import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
 import com.pickaflick.models.User;
 import com.pickaflick.services.TagService;
 import com.pickaflick.services.UserService;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/tags")
 public class TagController {
@@ -44,6 +44,7 @@ public class TagController {
 //		 return new ResponseEntity<>(tags, HttpStatus.OK);
 //	}
 
+	// checks that userId matches authorId first
 	@GetMapping("/all")
 	public ResponseEntity<List<Tag>> getAllTags(Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -58,6 +59,7 @@ public class TagController {
 //		 return new ResponseEntity<>(tag, HttpStatus.OK);
 //	}
 
+	// checks that userId matches authorId first
 	@GetMapping("/find/{id}")
 	public ResponseEntity<Tag> getTagById(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -82,19 +84,15 @@ public class TagController {
 
 //	@PutMapping("/update/{id}")
 //	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) { 
-//		// gets the name from the principal, which is the username
-//		String username = principal.getName();
-//		// gets the whole user profile from the username
-//		User currentUser = userService.getUserByUsername(username);
-//		// gets the userId from the user profile
-//		Long currentId = currentUser.getUserId();
+//		Long currentUserId = userService.getUserIdFromPrincipal(principal);	
 //		// sets the authorId to the userId
-//		tag.setAuthorId(currentId);
-//		// then saves the movie with updated info
+//		tag.setAuthorId(currentUserId);
+//		// then saves the tag with updated info
 //		Tag updateTag = tagService.updateTag(tag);
 //		return new ResponseEntity<>(updateTag, HttpStatus.OK);
 //	}
 
+	// checks that userId matches authorId first
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -120,6 +118,7 @@ public class TagController {
 //		 return new ResponseEntity<>(HttpStatus.OK);
 //	}
 
+	// checks that userId matches authorId first
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<?> deleteTag(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);

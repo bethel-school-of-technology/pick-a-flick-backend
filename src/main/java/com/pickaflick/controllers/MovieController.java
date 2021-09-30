@@ -25,7 +25,6 @@ import com.pickaflick.services.MovieService;
 import com.pickaflick.services.TagService;
 import com.pickaflick.services.UserService;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
@@ -51,6 +50,7 @@ public class MovieController {
 //		 return new ResponseEntity<>(movies, HttpStatus.OK);
 //	}
 
+	// checks that userId matches authorId first
 	@GetMapping("/all")
 	public ResponseEntity<List<Movie>> getAllMovies(Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -65,6 +65,7 @@ public class MovieController {
 //		 return new ResponseEntity<>(movie, HttpStatus.OK);
 //	}
 
+	// checks that userId matches authorId first
 	@GetMapping("/find/{id}")
 	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -76,7 +77,6 @@ public class MovieController {
 		}
 	}
 
-	// my working original code, but it returns ALL tagged movies, regardless of authorId
 //	@GetMapping("/find/tags?tagId={tagId}")   <- this doesn't work...was hoping everything after the ? would be optional but it errors.
 //	@GetMapping("/find/tag/{tagId}")
 //	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId) {
@@ -87,7 +87,7 @@ public class MovieController {
 //		return new ResponseEntity<>(movies, HttpStatus.OK);
 //	}
 	
-	// This works!
+	// checks that userId matches authorId first
 	@GetMapping("/find/tag/{tagId}")
 	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -115,7 +115,7 @@ public class MovieController {
 		}
 	}
 	
-	// still trying...another approach...
+	// ...another approach that I was trying for the above method:
 //	@GetMapping("/find/tag/{tagId}")
 //	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
 //		// Get the current user's id, which is the authorId for all their movies
@@ -157,21 +157,16 @@ public class MovieController {
 	}
 
 //	@PutMapping("/update/{id}")
-//	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie,
-//			Principal principal) {
-//		// gets the name from the principal, which is the username
-//		String username = principal.getName();
-//		// gets the whole user profile from the username
-//		User currentUser = userService.getUserByUsername(username);
-//		// gets the userId from the user profile
-//		Long currentId = currentUser.getUserId();
+//	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie, Principal principal) {
+//		Long currentUserId = userService.getUserIdFromPrincipal(principal);
 //		// sets the authorId to the userId
-//		movie.setAuthorId(currentId);
+//		movie.setAuthorId(currentUserId);
 //		// then saves the movie with updated info
 //		Movie updateMovie = movieService.updateMovie(movie);
 //		return new ResponseEntity<>(updateMovie, HttpStatus.OK);
 //	}
 
+	// checks that userId matches authorId first
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie,
 			Principal principal) {
@@ -192,16 +187,17 @@ public class MovieController {
 		}
 	}
 
-	// For Many to Many Relationship - attaches tag to movie
-	@PutMapping("/{movieId}/tags/{tagId}")
-	public ResponseEntity<Movie> attachTagToMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
-		Movie movie = movieService.findMovieById(movieId);
-		Tag tag = tagService.findTagById(tagId);
-		movie.attachTag(tag);
-		Movie taggedMovie = movieService.addMovie(movie);
-		return new ResponseEntity<>(taggedMovie, HttpStatus.OK);
-	}
-//	
+	// For Many to Many Relationship - attaches tag to movie, not using anymore
+//	@PutMapping("/{movieId}/tags/{tagId}")
+//	public ResponseEntity<Movie> attachTagToMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
+//		Movie movie = movieService.findMovieById(movieId);
+//		Tag tag = tagService.findTagById(tagId);
+//		movie.attachTag(tag);
+//		Movie taggedMovie = movieService.addMovie(movie);
+//		return new ResponseEntity<>(taggedMovie, HttpStatus.OK);
+//	}
+	
+	// For Many to Many Relationship - removes tag from movie, not using anymore
 //	@PutMapping("/{movieId}/tags/remove/{tagId}")
 //	public ResponseEntity<Movie> removeTagFromMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
 //		Movie movie = movieService.findMovieById(movieId);
@@ -217,6 +213,7 @@ public class MovieController {
 //		return new ResponseEntity<>(HttpStatus.OK);
 //	}
 	
+	// checks that userId matches authorId first
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<?> deleteMovie(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
