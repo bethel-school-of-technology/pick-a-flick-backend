@@ -41,7 +41,13 @@ public class UserService implements UserDetailsService {
 	}
 
 	public User findUserByUsername(String username) {
-		return userRepo.findByUsername(username);
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
+			throw new NotFoundException("Username " + username + " was not found.");
+		}
+		else {
+			return user;
+		}
 	}
 
 	public Long getUserIdFromPrincipal(Principal principal) {
@@ -55,15 +61,19 @@ public class UserService implements UserDetailsService {
 	}
 
 	public UserDetails addUser(User newUser) {
+		// gets proposed new username
 		String newUsername = newUser.getUsername();
+		// tries to find that new username in the DB to see if it already exists
 		User existingUser = userRepo.findByUsername(newUsername);
+		// if nothing found, then okay to create new user with that username:
 		if (existingUser == null) {
 			newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 			User savedUser = userRepo.save(newUser);
 			return new org.springframework.security.core.userdetails.User(savedUser.getUsername(),
 					savedUser.getPassword(), getAuthorities());
+			// if username was found, return message that username already exists
 		} else {
-			throw new AlreadyExistsException("Username " + newUsername + " already exists.");
+			throw new AlreadyExistsException("Username " + newUsername + " already exists - please choose a different username.");
 		}
 	}
 
