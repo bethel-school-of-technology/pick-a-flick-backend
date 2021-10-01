@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pickaflick.exceptions.NotFoundException;
-import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
 import com.pickaflick.repos.ITagRepo;
 

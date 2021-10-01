@@ -44,7 +44,7 @@ public class TagController {
 //		 return new ResponseEntity<>(tags, HttpStatus.OK);
 //	}
 
-	// checks that userId matches authorId first
+	// Gets all the tags - checks that userId matches authorId first
 	@GetMapping("/all")
 	public ResponseEntity<List<Tag>> getAllTags(Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -59,7 +59,7 @@ public class TagController {
 //		 return new ResponseEntity<>(tag, HttpStatus.OK);
 //	}
 
-	// checks that userId matches authorId first
+	// Gets tag by id - checks that userId matches authorId first
 	@GetMapping("/find/{id}")
 	public ResponseEntity<Tag> getTagById(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -74,6 +74,7 @@ public class TagController {
 		}
 	}
 
+	// Adds new tag - gets userId and assigns it to authorId
 	@PostMapping("/add")
 	public ResponseEntity<Tag> addTag(@RequestBody Tag tag, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -92,7 +93,7 @@ public class TagController {
 //		return new ResponseEntity<>(updateTag, HttpStatus.OK);
 //	}
 
-	// checks that userId matches authorId first
+	// Updates tag - checks that userId matches authorId first
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -102,9 +103,7 @@ public class TagController {
 		Long tagAuthorId = tagById.getAuthorId();
 
 		if (currentUserId == tagAuthorId) {
-			// sets the authorId to the userId
-			tag.setAuthorId(currentUserId);
-			// then saves the tag with updated info
+			// saves the tag with updated info
 			Tag updateTag = tagService.updateTag(tag);
 			return new ResponseEntity<>(updateTag, HttpStatus.OK);
 		} else {
@@ -118,7 +117,7 @@ public class TagController {
 //		 return new ResponseEntity<>(HttpStatus.OK);
 //	}
 
-	// checks that userId matches authorId first
+	// Deletes tag - checks that userId matches authorId first
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<?> deleteTag(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);

@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pickaflick.exceptions.UnauthorizedException;
 import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
-import com.pickaflick.models.User;
 import com.pickaflick.services.MovieService;
 import com.pickaflick.services.TagService;
 import com.pickaflick.services.UserService;
@@ -51,7 +49,7 @@ public class MovieController {
 //		 return new ResponseEntity<>(movies, HttpStatus.OK);
 //	}
 
-	// checks that userId matches authorId first
+	// Gets all the movies - checks that userId matches authorId first
 	@GetMapping("/all")
 	public ResponseEntity<List<Movie>> getAllMovies(Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -60,7 +58,7 @@ public class MovieController {
 		return new ResponseEntity<>(movies, HttpStatus.OK);
 	}
 	
-	// returns 10 most recently added movies
+	// returns 10 most recently added movies - checks that userId matches authorId first
 	@GetMapping("/recent")
 	public ResponseEntity<List<Movie>> getRecentMovies(Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -83,7 +81,7 @@ public class MovieController {
 //		 return new ResponseEntity<>(movie, HttpStatus.OK);
 //	}
 
-	// checks that userId matches authorId first
+	// Gets movie by id - checks that userId matches authorId first
 	@GetMapping("/find/{id}")
 	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -105,7 +103,7 @@ public class MovieController {
 //		return new ResponseEntity<>(movies, HttpStatus.OK);
 //	}
 	
-	// checks that userId matches authorId first
+	// Gets movies by tag - checks that userId matches authorId first
 	@GetMapping("/find/tag/{tagId}")
 	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -132,38 +130,8 @@ public class MovieController {
 			return new ResponseEntity<>(myTaggedMovies, HttpStatus.OK);
 		}
 	}
-	
-	// ...another approach that I was trying for the above method:
-//	@GetMapping("/find/tag/{tagId}")
-//	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId, Principal principal) {
-//		// Get the current user's id, which is the authorId for all their movies
-//		Long currentUserId = userService.getUserIdFromPrincipal(principal);
-//		
-//		// Get all the movies with that authorId
-//		Long authorId = currentUserId;
-//		List<Movie> allMovies = movieService.findMoviesByAuthorId(authorId);
-//		
-//		// make allMovies into an array list
-//		
-//		
-//		// take the tagId from the route & find that tag
-//		Tag tag = tagService.findTagById(tagId);
-//		
-//		// take that tag and use it to find all movies with that tag...how to make this method run on just allMovies instead of the movieRepo?  Is this possible?
-//		List<Movie> taggedMovies = allMovies.movieService.findMoviesByTag(tag);
-//		
-//		ArrayList<Movie> moviesArray = new ArrayList<Movie>(movies);
-//		for(int i = 0; i < moviesArray.size(); i++) {
-//			Array<Movie> taggedMovies;
-//			if (moviesArray[i].authorId == currentUserId) {
-//				taggedMovies.push(moviesArray[i]);
-//			}
-//			return taggedMovies;
-//		}
-//		
-//		return new ResponseEntity<>(movies, HttpStatus.OK);
-//	}
 
+	// Adds new movie - gets userId and assigns it to authorId
 	@PostMapping("/add")
 	public ResponseEntity<Movie> addMovie(@RequestBody Movie movie, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -184,7 +152,7 @@ public class MovieController {
 //		return new ResponseEntity<>(updateMovie, HttpStatus.OK);
 //	}
 
-	// checks that userId matches authorId first
+	// Updates movie - checks that userId matches authorId first
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie,
 			Principal principal) {
@@ -195,9 +163,7 @@ public class MovieController {
 		Long movieAuthorId = movieById.getAuthorId();
 
 		if (currentUserId == movieAuthorId) {
-			// sets the authorId to the userId
-			movie.setAuthorId(currentUserId);
-			// then saves the movie with updated info
+			// saves the movie with updated info
 			Movie updateMovie = movieService.updateMovie(movie);
 			return new ResponseEntity<>(updateMovie, HttpStatus.OK);
 		} else {
@@ -231,7 +197,7 @@ public class MovieController {
 //		return new ResponseEntity<>(HttpStatus.OK);
 //	}
 	
-	// checks that userId matches authorId first
+	// Deletes movie - checks that userId matches authorId first
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<?> deleteMovie(@PathVariable("id") Long id, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
