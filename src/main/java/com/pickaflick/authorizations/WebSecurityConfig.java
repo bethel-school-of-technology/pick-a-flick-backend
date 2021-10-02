@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       .csrf().disable()
       .authorizeRequests()
 //      change back to this when we are done testing..."/**" allows all testing without passing auth tokens:
-      .antMatchers(HttpMethod.POST, "SIGN_UP_URL").permitAll()   
+      .antMatchers(HttpMethod.POST, "/api/users/add").permitAll()   
 //      .antMatchers("/**").permitAll()
       .anyRequest().authenticated()
       .and()
