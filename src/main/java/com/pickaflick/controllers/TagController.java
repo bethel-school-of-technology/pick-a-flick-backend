@@ -74,13 +74,21 @@ public class TagController {
 		}
 	}
 
-	// Adds new tag - gets userId and assigns it to authorId
+	// Adds new tag - checks first to make sure max 15 tag limit has not been reached - if not, gets userId and assigns it to authorId then creates tag.
 	@PostMapping("/add")
 	public ResponseEntity<Tag> addTag(@RequestBody Tag tag, Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
-		tag.setAuthorId(currentUserId);
-		Tag newTag = tagService.addTag(tag);
-		return new ResponseEntity<>(newTag, HttpStatus.CREATED);
+		Long authorId = currentUserId;
+		List<Tag> tags = tagService.findTagsByAuthorId(authorId);
+		int numberOfTags = tags.size();
+		if(numberOfTags < 15) {
+			tag.setAuthorId(currentUserId);
+			Tag newTag = tagService.addTag(tag);
+			return new ResponseEntity<>(newTag, HttpStatus.CREATED);
+		}
+		else {
+			throw new UnauthorizedException("User cannot add tag - max number of tags is 15.");
+		}
 	}
 
 //	@PutMapping("/update/{id}")
