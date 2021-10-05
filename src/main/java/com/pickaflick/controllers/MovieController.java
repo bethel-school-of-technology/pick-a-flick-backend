@@ -43,12 +43,6 @@ public class MovieController {
 		this.userService = userService;
 	}
 
-//	@GetMapping("/all")
-//	public ResponseEntity<List<Movie>> getAllMovies() {
-//		 List<Movie> movies = movieService.findAllMovies();
-//		 return new ResponseEntity<>(movies, HttpStatus.OK);
-//	}
-
 	// Gets all the movies - checks that userId matches authorId first
 	@GetMapping("/all")
 	public ResponseEntity<List<Movie>> getAllMovies(Principal principal) {
@@ -75,12 +69,6 @@ public class MovieController {
 		}
 	}
 
-//	@GetMapping("/find/{id}")
-//	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id) {
-//		 Movie movie = movieService.findMovieById(id);
-//		 return new ResponseEntity<>(movie, HttpStatus.OK);
-//	}
-
 	// Gets movie by id - checks that userId matches authorId first
 	@GetMapping("/find/{id}")
 	public ResponseEntity<Movie> getMovieById(@PathVariable("id") Long id, Principal principal) {
@@ -92,16 +80,6 @@ public class MovieController {
 			throw new UnauthorizedException("User is not authorized to access.");
 		}
 	}
-
-//	@GetMapping("/find/tags?tagId={tagId}")   <- this doesn't work...was hoping everything after the ? would be optional but it errors.
-//	@GetMapping("/find/tag/{tagId}")
-//	public ResponseEntity<List<Movie>> getMoviesByTag(@PathVariable("tagId") Long tagId) {
-//		// take the tagId from the route & find that tag
-//		Tag tag = tagService.findTagById(tagId);
-//		// take that tag and use it to find all movies with that tag
-//		List<Movie> movies = movieService.findMoviesByTag(tag);
-//		return new ResponseEntity<>(movies, HttpStatus.OK);
-//	}
 	
 	// Gets movies by tag - checks that userId matches authorId first
 	@GetMapping("/find/tag/{tagId}")
@@ -142,16 +120,6 @@ public class MovieController {
 		return new ResponseEntity<>(newMovie, HttpStatus.CREATED);
 	}
 
-//	@PutMapping("/update/{id}")
-//	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie, Principal principal) {
-//		Long currentUserId = userService.getUserIdFromPrincipal(principal);
-//		// sets the authorId to the userId
-//		movie.setAuthorId(currentUserId);
-//		// then saves the movie with updated info
-//		Movie updateMovie = movieService.updateMovie(movie);
-//		return new ResponseEntity<>(updateMovie, HttpStatus.OK);
-//	}
-
 	// Updates movie - checks that userId matches authorId first
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Movie> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie,
@@ -170,32 +138,6 @@ public class MovieController {
 			throw new UnauthorizedException("User is not authorized to access.");
 		}
 	}
-
-	// For Many to Many Relationship - attaches tag to movie, not using anymore
-//	@PutMapping("/{movieId}/tags/{tagId}")
-//	public ResponseEntity<Movie> attachTagToMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
-//		Movie movie = movieService.findMovieById(movieId);
-//		Tag tag = tagService.findTagById(tagId);
-//		movie.attachTag(tag);
-//		Movie taggedMovie = movieService.addMovie(movie);
-//		return new ResponseEntity<>(taggedMovie, HttpStatus.OK);
-//	}
-	
-	// For Many to Many Relationship - removes tag from movie, not using anymore
-//	@PutMapping("/{movieId}/tags/remove/{tagId}")
-//	public ResponseEntity<Movie> removeTagFromMovie(@PathVariable("movieId") Long movieId, @PathVariable("tagId") Long tagId) {
-//		Movie movie = movieService.findMovieById(movieId);
-//		Tag tag = tagService.findTagById(tagId);
-//		movie.detachTag(tag);
-//		Movie untaggedMovie = movieService.addMovie(movie);
-//		return new ResponseEntity<>(untaggedMovie, HttpStatus.OK);
-//	}
-
-//	@DeleteMapping("/delete/{id}")
-//	public ResponseEntity<?> deleteMovie(@PathVariable("id") Long id) {
-//		movieService.deleteMovie(id);
-//		return new ResponseEntity<>(HttpStatus.OK);
-//	}
 	
 	// Deletes movie - checks that userId matches authorId first
 	@DeleteMapping("/delete/{id}")

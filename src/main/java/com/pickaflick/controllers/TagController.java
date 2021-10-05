@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pickaflick.exceptions.UnauthorizedException;
-import com.pickaflick.models.Movie;
 import com.pickaflick.models.Tag;
-import com.pickaflick.models.User;
 import com.pickaflick.services.TagService;
 import com.pickaflick.services.UserService;
 
@@ -38,12 +35,6 @@ public class TagController {
 		this.userService = userService;
 	}
 
-//	@GetMapping("/all")
-//	public ResponseEntity<List<Tag>> getAllTags() {
-//		 List<Tag> tags = tagService.findAllTags();
-//		 return new ResponseEntity<>(tags, HttpStatus.OK);
-//	}
-
 	// Gets all the tags - checks that userId matches authorId first
 	@GetMapping("/all")
 	public ResponseEntity<List<Tag>> getAllTags(Principal principal) {
@@ -52,12 +43,6 @@ public class TagController {
 		List<Tag> tags = tagService.findTagsByAuthorId(authorId);
 		return new ResponseEntity<>(tags, HttpStatus.OK);
 	}
-
-//	@GetMapping("/find/{id}")
-//	public ResponseEntity<Tag> getTagById(@PathVariable("id") Long id) {
-//		 Tag tag = tagService.findTagById(id);
-//		 return new ResponseEntity<>(tag, HttpStatus.OK);
-//	}
 
 	// Gets tag by id - checks that userId matches authorId first
 	@GetMapping("/find/{id}")
@@ -91,16 +76,6 @@ public class TagController {
 		}
 	}
 
-//	@PutMapping("/update/{id}")
-//	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) { 
-//		Long currentUserId = userService.getUserIdFromPrincipal(principal);	
-//		// sets the authorId to the userId
-//		tag.setAuthorId(currentUserId);
-//		// then saves the tag with updated info
-//		Tag updateTag = tagService.updateTag(tag);
-//		return new ResponseEntity<>(updateTag, HttpStatus.OK);
-//	}
-
 	// Updates tag - checks that userId matches authorId first
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Tag> updateTag(@PathVariable("id") Long id, @RequestBody Tag tag, Principal principal) {
@@ -118,12 +93,6 @@ public class TagController {
 			throw new UnauthorizedException("User is not authorized to access.");
 		}
 	}
-
-//	@DeleteMapping("/delete/{id}")
-//	public ResponseEntity<?> deleteTag(@PathVariable("id") Long id) {
-//		 tagService.deleteTag(id);
-//		 return new ResponseEntity<>(HttpStatus.OK);
-//	}
 
 	// Deletes tag - checks that userId matches authorId first
 	@DeleteMapping("/delete/{id}")

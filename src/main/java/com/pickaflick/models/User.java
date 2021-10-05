@@ -7,8 +7,7 @@ import javax.persistence.*;
 @Entity
 public class User implements Serializable {
 
-	// From Jared's original code - not sure if we need to do this or not:
-	// private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
