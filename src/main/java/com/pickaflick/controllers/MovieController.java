@@ -44,6 +44,7 @@ public class MovieController {
 	}
 
 	// Gets all the movies - checks that userId matches authorId first
+	// Principal is the current user. 
 	@GetMapping("/all")
 	public ResponseEntity<List<Movie>> getAllMovies(Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
@@ -53,6 +54,8 @@ public class MovieController {
 	}
 	
 	// returns 10 most recently added movies - checks that userId matches authorId first
+	//most recent movies are shown in reverse order to show the latest movie watched. If the user hasn't watched
+	//10 movies it will show the entire history starting with the most recent.
 	@GetMapping("/recent")
 	public ResponseEntity<List<Movie>> getRecentMovies(Principal principal) {
 		Long currentUserId = userService.getUserIdFromPrincipal(principal);
