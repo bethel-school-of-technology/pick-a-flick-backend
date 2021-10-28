@@ -1,4 +1,4 @@
-# pick-a-flick-backend
+# PickAFlickBackend
 
 Movie organizer that enables a user to categorize movies with custom, user-created tags, allowing them to easily add, edit, delete, and search their movies.  
 
