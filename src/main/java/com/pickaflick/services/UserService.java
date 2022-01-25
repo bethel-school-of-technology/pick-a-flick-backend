@@ -71,7 +71,7 @@ public class UserService implements UserDetailsService {
 			User savedUser = userRepo.save(newUser);
 			return new org.springframework.security.core.userdetails.User(savedUser.getUsername(),
 					savedUser.getPassword(), getAuthorities());
-			// if username was found, return message that username already exists
+		// if username was found, return message that username already exists
 		} else {
 			throw new AlreadyExistsException("Username " + newUsername + " already exists - please choose a different username.");
 		}
